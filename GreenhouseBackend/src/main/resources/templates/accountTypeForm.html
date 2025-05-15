@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Account Type</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+    <form class="toggle">
+        <input type="radio" id="musician" name="accountType" value="musician" required>
+        <label for="musician">Musician</label>
+
+        <input type="radio" id="organizer" name="accountType" value="organizer" required>
+        <label for="organizer">Organizer</label>
+
+        <div id="flap"><span class="content">Organizer</span></div>
+    </form>
+
+    <form action="/save-account-type" method="POST" id="submitForm">
+        <input type="hidden" name="email" th:value="${email}">
+        <input type="hidden" name="name" th:value="${name}">
+        <input type="hidden" name="provider" th:value="${provider}">
+        <input type="hidden" id="selectedAccountType" name="accountType">
+
+        <button style="align-self: center" type="submit">Continue</button>
+    </form>
+</div>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

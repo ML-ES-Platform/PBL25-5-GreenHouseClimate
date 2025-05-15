@@ -1,0 +1,35 @@
+<configuration>
+
+    <!-- Rolling File Appender -->
+    <appender name="FILTERED_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Log file location -->
+        <file>logs/app.log</file>
+
+        <!-- Rolling policy for log rotation -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Log file naming pattern with size and date -->
+            <fileNamePattern>logs/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize> <!-- Maximum size for a single log file -->
+            <maxHistory>10</maxHistory> <!-- Retain logs for a maximum of 10 days -->
+            <totalSizeCap>100MB</totalSizeCap> <!-- Ensure all logs combined do not exceed 100MB -->
+        </rollingPolicy>
+
+        <!-- Log message format -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+
+        <!-- Filter logs starting from INFO level -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Root logger configuration -->
+    <root level="INFO">
+        <appender-ref ref="FILTERED_FILE" />
+    </root>
+
+</configuration>

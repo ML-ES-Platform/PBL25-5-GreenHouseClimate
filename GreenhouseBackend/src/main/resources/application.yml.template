@@ -1,0 +1,47 @@
+server:
+  port:
+spring:
+  datasource:
+    url:
+    username:
+    password:
+
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id:
+            client-secret:
+            scope:
+              - email
+              - public_profile
+          google:
+            client-id:
+            client-secret:
+            scope:
+              - email
+              - profile
+          github:
+            client-id:
+            client-secret:
+            scope:
+              - email
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+
+security:
+  jwt:
+    secret-key:
+    expiration-time:
+
+google:
+  redirect-uri:
+
+github:
+  access-token:
+

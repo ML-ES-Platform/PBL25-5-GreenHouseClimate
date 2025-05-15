@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: ghousedb
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+    volumes:
+      - ./db-scripts:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  backend:
+    image: ghouseback
+    container_name: ghouseback
+    environment:
+      SPRING_DATASOURCE_URL: ${MYSQL_URL}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_USER_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USERNAME}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+
+volumes:
+  mysql-data:
