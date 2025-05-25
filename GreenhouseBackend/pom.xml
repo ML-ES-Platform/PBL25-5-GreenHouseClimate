@@ -139,7 +139,6 @@
             <artifactId>core</artifactId>
             <version>3.4.1</version>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -149,6 +148,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <finalName>greenhouse-app</finalName>
     </build>
 
 </project>

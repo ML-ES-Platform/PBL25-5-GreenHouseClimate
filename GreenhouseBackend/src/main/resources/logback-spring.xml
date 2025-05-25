@@ -20,15 +20,13 @@
         </encoder>
 
         <!-- Filter logs starting from INFO level -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
 
     <!-- Root logger configuration -->
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="FILTERED_FILE" />
     </root>
 
