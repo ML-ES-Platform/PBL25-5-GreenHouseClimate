@@ -21,4 +21,8 @@ public class SensorMeasurementService {
         return new ArrayList<>(sensorMeasurementRepository.findAll());
     }
 
+    public SensorMeasurement saveSensorMeasurement(SensorMeasurement sensorMeasurement) {
+        return sensorMeasurementRepository.save(sensorMeasurement);
+    }
+
 }
