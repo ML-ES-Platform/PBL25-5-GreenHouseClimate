@@ -30,6 +30,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/users/admin").hasRole("ADMIN")
                         .requestMatchers("/auth/**", "/login/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

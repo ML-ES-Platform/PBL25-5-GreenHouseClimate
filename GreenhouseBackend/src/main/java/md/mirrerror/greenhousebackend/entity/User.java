@@ -36,7 +36,7 @@ public class User implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_role", nullable = false) // Enable insert/update
+    @Column(name = "user_role", nullable = false)
     private UserRoles userRole;
 
     @CreationTimestamp

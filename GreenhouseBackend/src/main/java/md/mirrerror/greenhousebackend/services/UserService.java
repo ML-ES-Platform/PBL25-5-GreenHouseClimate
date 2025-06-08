@@ -2,7 +2,6 @@ package md.mirrerror.greenhousebackend.services;
 
 import lombok.RequiredArgsConstructor;
 import md.mirrerror.greenhousebackend.entity.User;
-import md.mirrerror.greenhousebackend.entity.UserRoles;
 import md.mirrerror.greenhousebackend.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,23 +31,6 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
-    }
-
-    public void updateUserRole(User currentUser, String role) {
-        if (role == null) return;
-
-        switch (role.toLowerCase()) {
-            case "admin":
-                currentUser.setUserRole(UserRoles.ADMIN);
-                break;
-            case "musician":
-            case "organizer":
-                currentUser.setUserRole(UserRoles.USER);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid role");
-        }
-        save(currentUser);
     }
 
     public User save(User user) {
