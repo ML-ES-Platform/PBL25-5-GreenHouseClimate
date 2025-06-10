@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenhouse Climate Control</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🌱 Greenhouse Climate Control</h1>
+        <p>Advanced Environmental Monitoring & Control System</p>
+        <div class="status-indicator"></div>
+    </div>
+
+    <div class="main-grid">
+        <div class="data-section">
+            <div class="current-data">
+                <div class="data-card temperature">
+                    <span class="icon">🌡️</span>
+                    <div class="value" id="temperature">--</div>
+                    <div class="label">Temperature (°C)</div>
+                </div>
+                <div class="data-card humidity">
+                    <span class="icon">💧</span>
+                    <div class="value" id="humidity">--</div>
+                    <div class="label">Humidity (%)</div>
+                </div>
+                <div class="data-card light">
+                    <span class="icon">☀️</span>
+                    <div class="value" id="light">--</div>
+                    <div class="label">Light (Lux)</div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-controls">
+                    <button class="time-button active" onclick="changeTimeRange('day')">Today</button>
+                    <button class="time-button" onclick="changeTimeRange('week')">This Week</button>
+                    <button class="time-button" onclick="changeTimeRange('month')">This Month</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="climateChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <h3>🎛️ Control Panel</h3>
+
+            <div class="control-group">
+                <h4>Ventilation</h4>
+                <button class="control-button off" id="windowBtn" onclick="toggleDevice('window')">
+                    Windows: OFF
+                </button>
+                <button class="control-button off" id="fanBtn" onclick="toggleDevice('fan')">
+                    Fans: OFF
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h4>Lighting</h4>
+                <button class="control-button off" id="ledBtn" onclick="toggleDevice('led')">
+                    LED Lights: OFF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="config.js"></script>
+<script src="chart.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
