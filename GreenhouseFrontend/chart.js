@@ -1,3 +1,6 @@
+
+
+
 // Export functions for global use
 if (typeof window !== 'undefined') {
     window.chartFunctions = {
@@ -194,7 +197,6 @@ function updateChartTimeRange(timeRange) {
         updateChart(mockData);
     }
 }
-
 // Generate mock data for fallback
 function generateMockHistoricalData(timeRange) {
     const data = {
