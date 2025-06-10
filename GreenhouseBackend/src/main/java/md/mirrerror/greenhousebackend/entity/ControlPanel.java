@@ -10,5 +10,6 @@ public class ControlPanel {
     private Boolean areWindowsOpened = false;
     private Boolean areFansOn = false;
     private Boolean areLightsOn = false;
+    private Double temperatureSetpoint;
 
 }

@@ -4,10 +4,9 @@ import lombok.RequiredArgsConstructor;
 import md.mirrerror.greenhousebackend.entity.ControlPanel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@RequestMapping("/control-panel")
 @RestController
 @RequiredArgsConstructor
 public class ControlPanelController {
@@ -15,29 +14,36 @@ public class ControlPanelController {
     private final ControlPanel controlPanel;
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/control-panel/state")
+    @GetMapping("/state")
     public ResponseEntity<ControlPanel> getControlPanelState() {
         return ResponseEntity.ok(controlPanel);
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/control-panel/toggle-windows")
+    @PostMapping("/toggle-windows")
     public ResponseEntity<Void> toggleWindows() {
         controlPanel.setAreWindowsOpened(!controlPanel.getAreWindowsOpened());
         return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/control-panel/toggle-fans")
+    @PostMapping("/toggle-fans")
     public ResponseEntity<Void> toggleFans() {
         controlPanel.setAreFansOn(!controlPanel.getAreFansOn());
         return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/control-panel/toggle-lights")
+    @PostMapping("/toggle-lights")
     public ResponseEntity<Void> toggleLights() {
         controlPanel.setAreLightsOn(!controlPanel.getAreLightsOn());
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/set-temperature-setpoint")
+    public ResponseEntity<Void> setTemperatureSetpoint(@RequestBody Double temperatureSetpoint) {
+        controlPanel.setTemperatureSetpoint(temperatureSetpoint);
         return ResponseEntity.ok().build();
     }
 
