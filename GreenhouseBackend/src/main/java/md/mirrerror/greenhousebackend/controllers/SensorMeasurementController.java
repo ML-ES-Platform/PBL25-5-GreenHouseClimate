@@ -2,6 +2,7 @@ package md.mirrerror.greenhousebackend.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import md.mirrerror.greenhousebackend.dtos.SensorMeasurementCreationDto;
 import md.mirrerror.greenhousebackend.dtos.SensorMeasurementDto;
 import md.mirrerror.greenhousebackend.dtos.mappers.SensorMeasurementMapper;
 import md.mirrerror.greenhousebackend.services.SensorMeasurementService;
@@ -33,8 +34,8 @@ public class SensorMeasurementController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/sensor-measurements/add")
-    public ResponseEntity<Void> addMeasurement(@RequestBody @Valid SensorMeasurementDto sensorMeasurementDto) {
-        sensorMeasurementService.saveSensorMeasurement(sensorMeasurementMapper.toSensorMeasurement(sensorMeasurementDto));
+    public ResponseEntity<Void> addMeasurement(@RequestBody @Valid SensorMeasurementCreationDto sensorMeasurementCreationDto) {
+        sensorMeasurementService.saveSensorMeasurement(sensorMeasurementMapper.toSensorMeasurement(sensorMeasurementCreationDto));
         return ResponseEntity.ok().build();
     }
 
