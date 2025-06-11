@@ -10,7 +10,41 @@ const API_ENDPOINTS = {
 };
 
 // Authentication token storage
-let authToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaW1hQGdtYWlsLmNvbSIsImlhdCI6MTc0OTQ2MTQ2MSwiZXhwIjoxNzUzMDYxNDYxfQ.Vj9-UEzpsw5TrfBSJorageQnkxS5uuMxilKaTMRT_ik';
+let authToken = null;
+
+// Authentication functions
+function promptForToken() {
+    const token = prompt('Please enter your JWT authentication token:');
+    if (token && token.trim()) {
+        setAuthToken(token.trim());
+        return true;
+    }
+    return false;
+}
+
+function isTokenExpired() {
+    if (!authToken) return true;
+
+    try {
+        const payload = JSON.parse(atob(authToken.split('.')[1]));
+        const exp = payload.exp * 1000; // Convert to milliseconds
+        return Date.now() >= exp;
+    } catch (error) {
+        console.error('Error checking token expiration:', error);
+        return true;
+    }
+}
+
+function ensureAuthenticated() {
+    if (!authToken || isTokenExpired()) {
+        const success = promptForToken();
+        if (!success) {
+            alert('Authentication is required to access the greenhouse system.');
+            return false;
+        }
+    }
+    return true;
+}
 
 // Helper function to get headers with authentication
 function getAuthHeaders() {
@@ -32,15 +66,21 @@ function handleApiError(error, operation) {
 
     if (error.status === 401) {
         console.error('Authentication required or token expired');
+        clearAuthToken();
+        if (promptForToken()) {
+            return true; // Indicate retry should be attempted
+        }
     } else if (error.status === 403) {
         console.error('Access forbidden - insufficient permissions');
     }
 
-    throw error;
+    return false;
 }
 
 // Load current sensor data from the latest measurements
 async function loadCurrentData() {
+    if (!ensureAuthenticated()) return;
+
     try {
         const response = await fetch(API_ENDPOINTS.sensorMeasurements, {
             method: 'GET',
@@ -49,6 +89,10 @@ async function loadCurrentData() {
         });
 
         if (!response.ok) {
+            const shouldRetry = handleApiError({ status: response.status, statusText: response.statusText }, 'loading current data');
+            if (shouldRetry && response.status === 401) {
+                return loadCurrentData(); // Retry with new token
+            }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
@@ -100,6 +144,8 @@ function showDataError() {
 
 // Load device status from control panel
 async function loadDeviceStatus() {
+    if (!ensureAuthenticated()) return;
+
     try {
         const response = await fetch(API_ENDPOINTS.controlPanelState, {
             method: 'GET',
@@ -108,6 +154,10 @@ async function loadDeviceStatus() {
         });
 
         if (!response.ok) {
+            const shouldRetry = handleApiError({ status: response.status, statusText: response.statusText }, 'loading device status');
+            if (shouldRetry && response.status === 401) {
+                return loadDeviceStatus(); // Retry with new token
+            }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
@@ -130,6 +180,8 @@ async function loadDeviceStatus() {
 
 // Load historical data for charts
 async function loadHistoricalData(timeRange) {
+    if (!ensureAuthenticated()) return;
+
     try {
         console.log(`Loading historical data for time range: ${timeRange}`);
 
@@ -140,6 +192,10 @@ async function loadHistoricalData(timeRange) {
         });
 
         if (!response.ok) {
+            const shouldRetry = handleApiError({ status: response.status, statusText: response.statusText }, 'loading historical data');
+            if (shouldRetry && response.status === 401) {
+                return loadHistoricalData(timeRange); // Retry with new token
+            }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
@@ -182,6 +238,9 @@ function filterDataByTimeRange(measurements, timeRange) {
     let cutoffTime;
 
     switch (timeRange) {
+        case 'now': // Last 5 minutes
+            cutoffTime = new Date(now.getTime() - 5 * 60 * 1000);
+            break;
         case 'day': // Last 24 hours
             cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
             break;
@@ -331,12 +390,17 @@ function convertToChartFormat(measurements, timeRange) {
             chartData.light.push(data.countLight > 0 ? Math.floor(data.sumLight / data.countLight) : 0);
         });
 
-    } else { // For 'day' (1h, 6h, 24h - use specific time format)
+    } else { // For 'day' and 'now' - use specific time format
         measurements.forEach((measurement, index) => {
             const timestamp = parseTimestamp(measurement.timestamp) || parseTimestamp(measurement.createdAt) || parseTimestamp(measurement.created_at);
             if (timestamp) {
                 const time = new Date(timestamp);
-                chartData.labels.push(time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                if (timeRange === 'now') {
+                    // For 'now' (5 minutes), show more precise time format
+                    chartData.labels.push(time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+                } else {
+                    chartData.labels.push(time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                }
             } else {
                 chartData.labels.push(`Point ${index + 1}`);
             }
@@ -359,6 +423,8 @@ function convertToChartFormat(measurements, timeRange) {
 
 // Toggle device state
 async function toggleDeviceAPI(device, newState) {
+    if (!ensureAuthenticated()) return false;
+
     try {
         let endpoint;
 
@@ -383,6 +449,10 @@ async function toggleDeviceAPI(device, newState) {
         });
 
         if (!response.ok) {
+            const shouldRetry = handleApiError({ status: response.status, statusText: response.statusText }, `toggling ${device}`);
+            if (shouldRetry && response.status === 401) {
+                return toggleDeviceAPI(device, newState); // Retry with new token
+            }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
@@ -397,6 +467,8 @@ async function toggleDeviceAPI(device, newState) {
 
 // Add a new sensor measurement
 async function addSensorMeasurement(measurementData) {
+    if (!ensureAuthenticated()) return false;
+
     try {
         const response = await fetch(API_ENDPOINTS.addSensorMeasurement, {
             method: 'POST',
@@ -406,6 +478,10 @@ async function addSensorMeasurement(measurementData) {
         });
 
         if (!response.ok) {
+            const shouldRetry = handleApiError({ status: response.status, statusText: response.statusText }, 'adding sensor measurement');
+            if (shouldRetry && response.status === 401) {
+                return addSensorMeasurement(measurementData); // Retry with new token
+            }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
@@ -425,6 +501,10 @@ function generateMockHistoricalData(timeRange) {
     let interval, count;
 
     switch (timeRange) {
+        case 'now':
+            interval = 30 * 1000; // 30 seconds
+            count = 10; // 5 minutes / 30 seconds = 10 points
+            break;
         case 'day':
             interval = 60 * 60 * 1000; // 1 hour
             count = 24;
@@ -449,7 +529,9 @@ function generateMockHistoricalData(timeRange) {
 
     for (let i = count - 1; i >= 0; i--) {
         const time = new Date(now.getTime() - i * interval);
-        if (timeRange === 'day') {
+        if (timeRange === 'now') {
+            labels.push(time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second: '2-digit'}));
+        } else if (timeRange === 'day') {
             labels.push(time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
         } else {
             labels.push(time.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}));
@@ -476,6 +558,8 @@ function clearAuthToken() {
 // Initialize API connection
 function initializeAPI() {
     console.log('Initializing API connection...');
+    if (!ensureAuthenticated()) return;
+
     loadCurrentData();
     loadDeviceStatus();
     loadHistoricalData('day');
@@ -491,6 +575,7 @@ if (typeof window !== 'undefined') {
         addSensorMeasurement,
         setAuthToken,
         clearAuthToken,
-        initializeAPI
+        initializeAPI,
+        ensureAuthenticated
     };
 }
