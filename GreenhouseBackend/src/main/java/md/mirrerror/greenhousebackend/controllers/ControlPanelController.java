@@ -66,11 +66,10 @@ public class ControlPanelController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/set-temperature-setpoint")
-    public ResponseEntity<Void> setTemperatureSetpoint(@RequestBody Double temperatureSetpoint) {
-        controlPanel.setTemperatureSetpoint(temperatureSetpoint);
+    public ResponseEntity<Void> setTemperatureSetpoint(@RequestBody TemperatureCommand temperatureSetpoint) {
+        controlPanel.setTemperatureSetpoint(temperatureSetpoint.getSetpoint());
 
-        TemperatureCommand command = TemperatureCommand.builder().setpoint(temperatureSetpoint).build();
-        awsIotService.sendCommand("SET_TEMPERATURE", command);
+        awsIotService.sendCommand("SET_TEMPERATURE", temperatureSetpoint);
 
         log.info("Temperature setpoint changed to: {}", temperatureSetpoint);
         return ResponseEntity.ok().build();
