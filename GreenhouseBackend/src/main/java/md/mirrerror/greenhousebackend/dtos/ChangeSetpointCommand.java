@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TemperatureCommand {
+public class ChangeSetpointCommand {
     private double setpoint;
 }

@@ -2,7 +2,7 @@ package md.mirrerror.greenhousebackend.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import md.mirrerror.greenhousebackend.dtos.TemperatureCommand;
+import md.mirrerror.greenhousebackend.dtos.ChangeSetpointCommand;
 import md.mirrerror.greenhousebackend.dtos.ToggleCommand;
 import md.mirrerror.greenhousebackend.entity.ControlPanel;
 import md.mirrerror.greenhousebackend.services.AWSIoTService;
@@ -66,12 +66,24 @@ public class ControlPanelController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/set-temperature-setpoint")
-    public ResponseEntity<Void> setTemperatureSetpoint(@RequestBody TemperatureCommand temperatureSetpoint) {
-        controlPanel.setTemperatureSetpoint(temperatureSetpoint.getSetpoint());
+    public ResponseEntity<Void> setTemperatureSetpoint(@RequestBody ChangeSetpointCommand temperatureSetpointCommand) {
+        controlPanel.setTemperatureSetpoint(temperatureSetpointCommand.getSetpoint());
 
-        awsIotService.sendCommand("SET_TEMPERATURE", temperatureSetpoint);
+        awsIotService.sendCommand("SET_TEMPERATURE", temperatureSetpointCommand);
 
-        log.info("Temperature setpoint changed to: {}", temperatureSetpoint);
+        log.info("Temperature setpoint changed to: {}", temperatureSetpointCommand);
         return ResponseEntity.ok().build();
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/set-humidity-setpoint")
+    public ResponseEntity<Void> setHumiditySetpoint(@RequestBody ChangeSetpointCommand humiditySetpointCommand) {
+        controlPanel.setHumiditySetpoint(humiditySetpointCommand.getSetpoint());
+
+        awsIotService.sendCommand("SET_HUMIDITY", humiditySetpointCommand);
+
+        log.info("Humidity setpoint changed to: {}", humiditySetpointCommand);
+        return ResponseEntity.ok().build();
+    }
+
 }
