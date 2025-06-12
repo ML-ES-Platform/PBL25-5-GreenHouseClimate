@@ -26,6 +26,19 @@ public class ControlPanelController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @PostMapping("/update-state")
+    public ResponseEntity<Void> updateControlPanelState(@RequestBody ControlPanel newState) {
+        controlPanel.setAreWindowsOpened(newState.getAreWindowsOpened());
+        controlPanel.setAreFansOn(newState.getAreFansOn());
+        controlPanel.setAreLightsOn(newState.getAreLightsOn());
+        controlPanel.setTemperatureSetpoint(newState.getTemperatureSetpoint());
+        controlPanel.setHumiditySetpoint(newState.getHumiditySetpoint());
+
+        log.info("Control panel state updated: {}", newState);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/toggle-windows")
     public ResponseEntity<Void> toggleWindows() {
         boolean newState = !controlPanel.getAreWindowsOpened();
