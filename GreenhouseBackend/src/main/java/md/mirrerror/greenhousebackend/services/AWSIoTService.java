@@ -83,6 +83,7 @@ public class AWSIoTService {
             try {
                 boolean sessionPresent = connected.get();
                 log.info("Connected to AWS IoT Core: {}", sessionPresent ? "existing session" : "new session");
+                sendCommand("REQUEST_UPDATE", null);
             } catch (Exception ex) {
                 throw new RuntimeException("Exception occurred during connect", ex);
             }
