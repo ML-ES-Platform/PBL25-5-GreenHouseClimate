@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 @Data
 public class ControlPanel {
 
-    private Boolean areWindowsOpened;
-    private Boolean areFansOn;
-    private Boolean areLightsOn;
-    private Double temperatureSetpoint;
-    private Double humiditySetpoint;
+    private Boolean areWindowsOpened = false;
+    private Boolean areFansOn = false;
+    private Boolean areLightsOn = false;
+    private Double temperatureSetpoint = 0.0;
+    private Double humiditySetpoint = 0.0;
 
 }
