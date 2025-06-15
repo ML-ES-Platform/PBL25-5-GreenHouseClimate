@@ -60,7 +60,33 @@
                     Fans: OFF
                 </button>
             </div>
+            <div class="setpoints-panel">
+                <h3>🎯 Setpoints</h3>
 
+                <div class="setpoint-group">
+                    <h4>Temperature (°C)</h4>
+                    <div class="setpoint-input-group">
+                        <input type="number" id="tempSetpoint" placeholder="22" step="0.1" min="0" max="50">
+                        <button class="setpoint-button" onclick="updateSetpoint('temperature')">Set</button>
+                    </div>
+                </div>
+
+                <div class="setpoint-group">
+                    <h4>Humidity (%)</h4>
+                    <div class="setpoint-input-group">
+                        <input type="number" id="humiditySetpoint" placeholder="55" step="1" min="0" max="100">
+                        <button class="setpoint-button" onclick="updateSetpoint('humidity')">Set</button>
+                    </div>
+                </div>
+
+                <div class="setpoint-group">
+                    <h4>Light (Lux)</h4>
+                    <div class="setpoint-input-group">
+                        <input type="number" id="lightSetpoint" placeholder="400" step="10" min="0" max="2000">
+                        <button class="setpoint-button" onclick="updateSetpoint('light')">Set</button>
+                    </div>
+                </div>
+            </div>
             <div class="control-group">
                 <h4>Lighting</h4>
                 <button class="control-button off" id="ledBtn" onclick="toggleDevice('led')">
