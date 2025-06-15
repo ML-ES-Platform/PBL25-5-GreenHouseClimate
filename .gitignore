@@ -39,3 +39,4 @@ build/
 /Arduino/.pio
 /Arduino/.vscode
 /Arduino/src/Config.h
+/Arduino/.gitignore
