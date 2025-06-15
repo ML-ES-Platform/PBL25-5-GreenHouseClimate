@@ -12,5 +12,6 @@ public class ControlPanel {
     private Boolean areLightsOn = false;
     private Double temperatureSetpoint = 0.0;
     private Double humiditySetpoint = 0.0;
+    private Double lightSetpoint = 0.0;
 
 }

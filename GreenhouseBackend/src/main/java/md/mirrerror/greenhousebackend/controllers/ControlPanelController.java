@@ -33,6 +33,7 @@ public class ControlPanelController {
         controlPanel.setAreLightsOn(newState.getAreLightsOn());
         controlPanel.setTemperatureSetpoint(newState.getTemperatureSetpoint());
         controlPanel.setHumiditySetpoint(newState.getHumiditySetpoint());
+        controlPanel.setLightSetpoint(newState.getLightSetpoint());
 
         log.info("Control panel state updated: {}", newState);
         return ResponseEntity.ok().build();
@@ -96,6 +97,17 @@ public class ControlPanelController {
         awsIotService.sendCommand("SET_HUMIDITY", humiditySetpointCommand);
 
         log.info("Humidity setpoint changed to: {}", humiditySetpointCommand);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/set-light-setpoint")
+    public ResponseEntity<Void> setLightSetpoint(@RequestBody ChangeSetpointCommand lightSetpointCommand) {
+        controlPanel.setTemperatureSetpoint(lightSetpointCommand.getSetpoint());
+
+        awsIotService.sendCommand("SET_LIGHT", lightSetpointCommand);
+
+        log.info("Light setpoint changed to: {}", lightSetpointCommand);
         return ResponseEntity.ok().build();
     }
 

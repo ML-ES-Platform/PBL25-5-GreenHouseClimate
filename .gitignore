@@ -35,3 +35,10 @@ build/
 
 /logs/
 /aws-iot-files
+
+/Arduino/.pio
+/Arduino/.vscode
+/Arduino/src/Config.h
+/Arduino/.gitignore
+
+.env
