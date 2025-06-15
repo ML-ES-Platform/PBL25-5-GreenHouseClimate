@@ -7,7 +7,9 @@ const API_ENDPOINTS = {
     toggleFans: `${API_BASE_URL}/control-panel/toggle-fans`,
     toggleLights: `${API_BASE_URL}/control-panel/toggle-lights`,
     sensorMeasurements: `${API_BASE_URL}/sensor-measurements`,
-    addSensorMeasurement: `${API_BASE_URL}/sensor-measurements/add`
+    addSensorMeasurement: `${API_BASE_URL}/sensor-measurements/add`,
+    getSetpoints: `${API_BASE_URL}/setpoints`,
+    updateSetpoints: `${API_BASE_URL}/setpoints`
 };
 
 // Authentication token storage
@@ -583,7 +585,8 @@ async function initializeAPI() {
             await Promise.all([
                 loadCurrentData(),
                 loadDeviceStatus(),
-                loadHistoricalData('day')
+                loadHistoricalData('day'),
+                loadSetpoints()  // Add this line
             ]);
             console.log('API initialization complete');
         } else {
@@ -593,7 +596,6 @@ async function initializeAPI() {
         console.error('Failed to initialize API:', error);
     }
 }
-
 // Keep your existing utility functions
 function filterDataByTimeRange(measurements, timeRange) {
     if (!measurements || measurements.length === 0) {
@@ -813,7 +815,45 @@ function generateMockHistoricalData(timeRange) {
 
     return { labels, temperature, humidity, light };
 }
+// Load current setpoints
+async function loadSetpoints() {
+    try {
+        const response = await makeAuthenticatedRequest(
+            API_ENDPOINTS.getSetpoints,
+            { method: 'GET' },
+            'loading setpoints'
+        );
 
+        const setpoints = await response.json();
+        console.log('Loaded setpoints:', setpoints);
+        return setpoints;
+
+    } catch (error) {
+        console.error('Failed to load setpoints:', error);
+        return { temperature: 22, humidity: 55, light: 400 };
+    }
+}
+
+// Update setpoint
+async function updateSetpoint(type, value) {
+    try {
+        await makeAuthenticatedRequest(
+            API_ENDPOINTS.updateSetpoints,
+            {
+                method: 'POST',
+                body: JSON.stringify({ [type]: parseFloat(value) })
+            },
+            `updating ${type} setpoint`
+        );
+
+        console.log(`${type} setpoint updated to ${value}`);
+        return true;
+
+    } catch (error) {
+        console.error(`Failed to update ${type} setpoint:`, error);
+        return false;
+    }
+}
 // Export functions for use in other scripts
 if (typeof window !== 'undefined') {
     window.greenhouseAPI = {

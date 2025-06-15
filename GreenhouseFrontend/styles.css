@@ -269,12 +269,20 @@ body {
         grid-template-columns: 1fr;
     }
 
+    .side-panels {
+        flex-direction: row;
+    }
+
     .current-data {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
+    .side-panels {
+        flex-direction: column;
+    }
+
     .current-data {
         grid-template-columns: 1fr;
     }
@@ -286,4 +294,83 @@ body {
     .time-button {
         flex: 1;
     }
+}
+.side-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.setpoints-panel {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.setpoints-panel h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.5em;
+}
+
+.setpoint-group {
+    margin-bottom: 20px;
+}
+
+.setpoint-group h4 {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.setpoint-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.setpoint-input-group input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.setpoint-input-group input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.setpoint-input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.setpoint-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #4CAF50, #81C784);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    min-width: 60px;
+}
+
+.setpoint-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
+
+.setpoint-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }

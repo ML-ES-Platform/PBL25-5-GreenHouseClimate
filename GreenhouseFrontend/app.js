@@ -61,7 +61,70 @@ function showAuthenticationError() {
         `;
     }
 }
+// Load and display setpoints
+async function loadSetpoints() {
+    if (window.greenhouseAPI && !window.greenhouseAPI.ensureAuthenticated()) {
+        return;
+    }
 
+    try {
+        const setpoints = await window.greenhouseAPI.loadSetpoints();
+        updateSetpointDisplay(setpoints);
+    } catch (error) {
+        console.error('Failed to load setpoints:', error);
+    }
+}
+
+// Update setpoint display
+function updateSetpointDisplay(setpoints) {
+    const tempInput = document.getElementById('tempSetpoint');
+    const humidityInput = document.getElementById('humiditySetpoint');
+    const lightInput = document.getElementById('lightSetpoint');
+
+    if (tempInput) tempInput.value = setpoints.temperature || 22;
+    if (humidityInput) humidityInput.value = setpoints.humidity || 55;
+    if (lightInput) lightInput.value = setpoints.light || 400;
+}
+
+// Update individual setpoint
+async function updateSetpoint(type) {
+    if (window.greenhouseAPI && !window.greenhouseAPI.ensureAuthenticated()) {
+        return;
+    }
+
+    const inputId = `${type}Setpoint`;
+    const input = document.getElementById(inputId);
+    const button = document.querySelector(`[onclick="updateSetpoint('${type}')"]`);
+
+    if (!input) return;
+
+    const value = input.value.trim();
+    if (!value || isNaN(value)) {
+        alert('Please enter a valid number');
+        return;
+    }
+
+    // Visual feedback
+    button.textContent = 'Updating...';
+    button.disabled = true;
+
+    try {
+        const success = await window.greenhouseAPI.updateSetpoint(type, value);
+        if (success) {
+            button.textContent = 'Updated!';
+            setTimeout(() => {
+                button.textContent = 'Set';
+                button.disabled = false;
+            }, 1500);
+        } else {
+            throw new Error('Update failed');
+        }
+    } catch (error) {
+        alert(`Failed to update ${type} setpoint`);
+        button.textContent = 'Set';
+        button.disabled = false;
+    }
+}
 // Change time range for charts
 function changeTimeRange(range) {
     if (window.greenhouseAPI && !window.greenhouseAPI.ensureAuthenticated()) {
