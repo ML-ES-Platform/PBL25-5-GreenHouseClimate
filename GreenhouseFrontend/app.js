@@ -81,9 +81,9 @@ function updateSetpointDisplay(setpoints) {
     const humidityInput = document.getElementById('humiditySetpoint');
     const lightInput = document.getElementById('lightSetpoint');
 
-    if (tempInput) tempInput.value = setpoints.temperature || 22;
+    if (tempInput) tempInput.value = setpoints.temperature || 21;
     if (humidityInput) humidityInput.value = setpoints.humidity || 55;
-    if (lightInput) lightInput.value = setpoints.light || 400;
+    if (lightInput) lightInput.value = setpoints.light || 40;
 }
 
 // Update individual setpoint
@@ -120,6 +120,7 @@ async function updateSetpoint(type) {
             throw new Error('Update failed');
         }
     } catch (error) {
+        console.error(error);
         alert(`Failed to update ${type} setpoint`);
         button.textContent = 'Set';
         button.disabled = false;

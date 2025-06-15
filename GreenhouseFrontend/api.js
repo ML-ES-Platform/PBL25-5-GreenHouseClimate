@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = 'http://44.201.149.111:8080';
+const API_BASE_URL = 'http://44.201.250.1:8080';
 const API_ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login`,
     controlPanelState: `${API_BASE_URL}/control-panel/state`,
@@ -9,7 +9,9 @@ const API_ENDPOINTS = {
     sensorMeasurements: `${API_BASE_URL}/sensor-measurements`,
     addSensorMeasurement: `${API_BASE_URL}/sensor-measurements/add`,
     getSetpoints: `${API_BASE_URL}/setpoints`,
-    updateSetpoints: `${API_BASE_URL}/setpoints`
+    updateHumiditySetpoints: `${API_BASE_URL}/control-panel/set-humidity-setpoint`,
+    updateLightSetpoints: `${API_BASE_URL}/control-panel/set-light-setpoint`,
+    updateTemperatureSetpoints: `${API_BASE_URL}/control-panel/set-temperature-setpoint`
 };
 
 // Authentication token storage
@@ -819,29 +821,72 @@ function generateMockHistoricalData(timeRange) {
 async function loadSetpoints() {
     try {
         const response = await makeAuthenticatedRequest(
-            API_ENDPOINTS.getSetpoints,
+            API_ENDPOINTS.controlPanelState,
             { method: 'GET' },
             'loading setpoints'
         );
 
-        const setpoints = await response.json();
-        console.log('Loaded setpoints:', setpoints);
+        const controlPanel = await response.json();
+        console.log('Loaded setpoints:', controlPanel);
+        await updateSetpoint("temperature", controlPanel.temperatureSetpoint)
+        await updateSetpoint("humidity", controlPanel.humiditySetpoint)
+        await updateSetpoint("light", controlPanel.lightSetpoint)
         return setpoints;
 
     } catch (error) {
         console.error('Failed to load setpoints:', error);
-        return { temperature: 22, humidity: 55, light: 400 };
+        return { temperature: 21, humidity: 51, light: 40 };
+    }
+}
+async function loadDeviceStatus() {
+    try {
+        const response = await makeAuthenticatedRequest(
+            API_ENDPOINTS.controlPanelState,
+            { method: 'GET' },
+            'loading device status'
+        );
+
+        const controlPanel = await response.json();
+        console.log('Control panel state:', controlPanel);
+
+        const deviceStates = {
+            window: controlPanel.areWindowsOpened || false,
+            fan: controlPanel.areFansOn || false,
+            led: controlPanel.areLightsOn || false
+        };
+
+        updateDeviceStates(deviceStates);
+
+    } catch (error) {
+        console.error('Failed to load device status:', error);
+        updateDeviceStates({ window: false, fan: false, led: false });
     }
 }
 
 // Update setpoint
 async function updateSetpoint(type, value) {
+console.log(JSON.stringify({ ["setpoint"]: parseFloat(value) }))
     try {
+        console.log("TYPE OF:" , type);
+        let endpoint
+        switch (type) {
+            case 'temperature':
+                endpoint = API_ENDPOINTS.updateTemperatureSetpoints;
+                break;
+            case 'humidity':
+                endpoint = API_ENDPOINTS.updateHumiditySetpoints;
+                break;
+            case 'light':
+                endpoint = API_ENDPOINTS.updateLightSetpoints;
+                break;
+            default:
+                throw new Error(`Unknown type: ${type}`);
+        }
         await makeAuthenticatedRequest(
-            API_ENDPOINTS.updateSetpoints,
+            endpoint,
             {
                 method: 'POST',
-                body: JSON.stringify({ [type]: parseFloat(value) })
+                body: JSON.stringify({ ["setpoint"]: parseFloat(value) })
             },
             `updating ${type} setpoint`
         );
@@ -850,7 +895,8 @@ async function updateSetpoint(type, value) {
         return true;
 
     } catch (error) {
-        console.error(`Failed to update ${type} setpoint:`, error);
+        console.log(JSON.stringify({ ["setpoint"]: parseFloat(value) }))
+        console.error(`Failed tototo update ${type} setpoint:`, error);
         return false;
     }
 }
@@ -865,6 +911,7 @@ if (typeof window !== 'undefined') {
         clearAuthToken,
         logout,
         initializeAPI,
-        ensureAuthenticated
+        ensureAuthenticated,
+        updateSetpoint
     };
 }
