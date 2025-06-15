@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = 'http://44.201.250.1:8080';
+const API_BASE_URL = 'http://gccbackALB-228053873.us-east-1.elb.amazonaws.com';
 const API_ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login`,
     controlPanelState: `${API_BASE_URL}/control-panel/state`,
