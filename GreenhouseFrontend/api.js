@@ -206,7 +206,7 @@ function createLoginModal() {
 
 // Add this function to api.js:
 function updateSetpointDisplay(setpoints) {
-    const tempInput = document.getElementById('tempSetpoint');
+    const tempInput = document.getElementById('temperatureSetpoint');
     const humidityInput = document.getElementById('humiditySetpoint');
     const lightInput = document.getElementById('lightSetpoint');
 
@@ -965,7 +965,7 @@ async function loadDeviceStatus() {
 
 // Update setpoint
 async function updateSetpoint(type, value) {
-console.log(JSON.stringify({ ["setpoint"]: parseFloat(value) }))
+    console.log(JSON.stringify({ ["setpoint"]: parseFloat(value) }))
     try {
         console.log("TYPE OF:" , type);
         let endpoint
