@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = 'http://gccbackALB-228053873.us-east-1.elb.amazonaws.com';
+const API_BASE_URL = 'https://back-gcc.ajdsgkljadkgjg.xyz';
 const API_ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login`,
     controlPanelState: `${API_BASE_URL}/control-panel/state`,
@@ -347,7 +347,7 @@ async function handleApiError(error, operation) {
     return false;
 }
 
-// Generic API call wrapper with authentication
+// Enhanced error handling for SSL and network issues
 async function makeAuthenticatedRequest(url, options = {}, operation = 'making request') {
     if (!(await ensureAuthenticated())) {
         throw new Error('Authentication required');
@@ -391,11 +391,92 @@ async function makeAuthenticatedRequest(url, options = {}, operation = 'making r
 
         return response;
     } catch (error) {
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            console.error('Network error:', error);
-            alert('Network error. Please check your internet connection.');
+        // Enhanced error handling for different types of network errors
+        if (error.name === 'TypeError') {
+            if (error.message.includes('Failed to fetch')) {
+                if (url.startsWith('https://')) {
+                    console.error('SSL Certificate error detected. Possible solutions:');
+                    console.error('1. Use HTTP instead of HTTPS for development');
+                    console.error('2. Configure a valid SSL certificate on your server');
+                    console.error('3. Use a custom domain with proper SSL setup');
+
+                    alert(`SSL Certificate Error: The server's SSL certificate is invalid or doesn't match the domain.\n\nFor development, try using HTTP instead of HTTPS.\nFor production, configure a valid SSL certificate.`);
+                } else {
+                    console.error('Network error:', error);
+                    alert('Network error. Please check your internet connection and server status.');
+                }
+            } else {
+                console.error('Request error:', error);
+                alert(`Request failed: ${error.message}`);
+            }
+        } else {
+            console.error('Unexpected error:', error);
+            alert(`An unexpected error occurred: ${error.message}`);
         }
         throw error;
+    }
+}
+
+// Alternative function to test both HTTP and HTTPS
+async function testConnection() {
+    const baseUrl = 'gccbackALB-228053873.us-east-1.elb.amazonaws.com';
+    const endpoints = [`https://${baseUrl}`, `http://${baseUrl}`];
+
+    for (const endpoint of endpoints) {
+        try {
+            console.log(`Testing connection to: ${endpoint}`);
+            const response = await fetch(`${endpoint}/health`, {
+                method: 'GET',
+                mode: 'cors',
+                timeout: 5000
+            });
+
+            if (response.ok) {
+                console.log(`✅ Connection successful to: ${endpoint}`);
+                return endpoint;
+            }
+        } catch (error) {
+            console.log(`❌ Connection failed to: ${endpoint} - ${error.message}`);
+        }
+    }
+
+    throw new Error('Unable to connect to server via HTTP or HTTPS');
+}
+
+// Initialize with automatic protocol detection
+async function initializeAPIWithAutoDetection() {
+    try {
+        const workingEndpoint = await testConnection();
+
+        // Update API_BASE_URL with the working endpoint
+        window.API_BASE_URL = workingEndpoint;
+
+        // Reinitialize endpoints
+        const API_ENDPOINTS = {
+            login: `${workingEndpoint}/auth/login`,
+            controlPanelState: `${workingEndpoint}/control-panel/state`,
+            toggleWindows: `${workingEndpoint}/control-panel/toggle-windows`,
+            toggleFans: `${workingEndpoint}/control-panel/toggle-fans`,
+            toggleLights: `${workingEndpoint}/control-panel/toggle-lights`,
+            sensorMeasurements: `${workingEndpoint}/sensor-measurements`,
+            addSensorMeasurement: `${workingEndpoint}/sensor-measurements/add`,
+            getSetpoints: `${workingEndpoint}/setpoints`,
+            updateHumiditySetpoints: `${workingEndpoint}/control-panel/set-humidity-setpoint`,
+            updateLightSetpoints: `${workingEndpoint}/control-panel/set-light-setpoint`,
+            updateTemperatureSetpoints: `${workingEndpoint}/control-panel/set-temperature-setpoint`,
+            setAutomode: `${workingEndpoint}/control-panel/set-auto-mode`
+        };
+
+        window.API_ENDPOINTS = API_ENDPOINTS;
+
+        console.log(`API initialized with: ${workingEndpoint}`);
+
+        // Continue with normal initialization
+        await initializeAPI();
+
+    } catch (error) {
+        console.error('Failed to initialize API with auto-detection:', error);
+        alert('Unable to connect to the server. Please check your network connection and server status.');
     }
 }
 
