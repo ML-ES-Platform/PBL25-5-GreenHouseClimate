@@ -260,6 +260,7 @@ void closeWindow() {
 }
 
 void startFan() {
+    if (1) return;  // Disable fan control for now
     if (!fanRunning && lastFanState != true) {  // Only act if state actually changed
         Serial.println("Starting motor fan...");
         digitalWrite(FAN_RELAY, HIGH);  
@@ -272,6 +273,7 @@ void startFan() {
 }
 
 void stopFan() {
+    if (1) return;
     if (fanRunning && lastFanState != false) {  // Only act if state actually changed
         Serial.println("Stopping motor fan...");
         digitalWrite(FAN_RELAY, LOW);
@@ -292,11 +294,13 @@ void controlLED(float lightLevel) {
             ledOn = true;
             lastLEDState = true;
             Serial.printf("LED turned ON (light: %.1f < %.1f lx)\n", lightLevel, lightSetpoint);
+            updateControlPanelState();  // Update control panel state when LED changes
         } else if (!shouldBeOn && (ledOn || lastLEDState != false)) {
             digitalWrite(LED_RELAY, HIGH);
             ledOn = false;
             lastLEDState = false;
             Serial.printf("LED turned OFF (light: %.1f >= %.1f lx)\n", lightLevel, lightSetpoint);
+            updateControlPanelState();  // Update control panel state when LED changes
         }
     }
 }
@@ -311,9 +315,11 @@ void controlSystems(float temperature, float humidity, float lightLevel) {
         if (temperature > temperatureSetpoint && !windowOpen) {
             openWindow();
             Serial.printf("Window opened for cooling (temperature: %.1f°C > %.1f°C)\n", temperature, temperatureSetpoint);
+            updateControlPanelState();  // Update control panel state when window changes
         } else if (temperature <= temperatureSetpoint && windowOpen) {
             closeWindow();
             Serial.printf("Window closed (temperature: %.1f°C <= %.1f°C)\n", temperature, temperatureSetpoint);
+            updateControlPanelState();  // Update control panel state when window changes
         }
     }
     
@@ -322,9 +328,11 @@ void controlSystems(float temperature, float humidity, float lightLevel) {
         if (humidity > humiditySetpoint && !fanRunning) {
             startFan();
             Serial.printf("Fan started for dehumidifying (humidity: %.1f%% > %.1f%%)\n", humidity, humiditySetpoint);
+            updateControlPanelState();  // Update control panel state when fan changes
         } else if (humidity <= humiditySetpoint && fanRunning) {
             stopFan();
             Serial.printf("Fan stopped (humidity: %.1f%% <= %.1f%%)\n", humidity, humiditySetpoint);
+            updateControlPanelState();  // Update control panel state when fan changes
         }
     }
     
