@@ -103,7 +103,7 @@ public class ControlPanelController {
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/set-light-setpoint")
     public ResponseEntity<Void> setLightSetpoint(@RequestBody ChangeSetpointCommand lightSetpointCommand) {
-        controlPanel.setTemperatureSetpoint(lightSetpointCommand.getSetpoint());
+        controlPanel.setLightSetpoint(lightSetpointCommand.getSetpoint());
 
         awsIotService.sendCommand("SET_LIGHT", lightSetpointCommand);
 
