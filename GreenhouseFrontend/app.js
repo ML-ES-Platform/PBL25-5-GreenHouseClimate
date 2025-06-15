@@ -196,7 +196,36 @@ function getButtonText(device, state) {
 
     return `${deviceNames[device]}: ${state ? 'ON' : 'OFF'}`;
 }
+// Set auto mode
+async function setAutoMode() {
+    if (window.greenhouseAPI && !window.greenhouseAPI.ensureAuthenticated()) {
+        return;
+    }
 
+    const button = document.getElementById('autoModeBtn');
+
+    // Visual feedback
+    button.textContent = 'Setting...';
+    button.disabled = true;
+
+    try {
+        const success = await window.greenhouseAPI.setAutoMode();
+        if (success) {
+            button.textContent = 'Auto Mode Set!';
+            setTimeout(() => {
+                button.textContent = 'Set Automode';
+                button.disabled = false;
+            }, 1500);
+        } else {
+            throw new Error('Set auto mode failed');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Failed to set auto mode');
+        button.textContent = 'Set Automode';
+        button.disabled = false;
+    }
+}
 // Add visual feedback for button clicks
 function setupButtonFeedback() {
     document.addEventListener('click', function(e) {

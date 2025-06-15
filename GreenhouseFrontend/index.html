@@ -52,12 +52,25 @@
             <h3>🎛️ Control Panel</h3>
 
             <div class="control-group">
+                <h4>Auto Control</h4>
+                <button class="control-button off" id="autoModeBtn" onclick="setAutoMode()">
+                    Set Automode
+                </button>
+            </div>
+
+            <div class="control-group">
                 <h4>Ventilation</h4>
                 <button class="control-button off" id="windowBtn" onclick="toggleDevice('window')">
                     Windows: OFF
                 </button>
                 <button class="control-button off" id="fanBtn" onclick="toggleDevice('fan')">
                     Fans: OFF
+                </button>
+            </div>
+            <div class="control-group">
+                <h4>Lighting</h4>
+                <button class="control-button off" id="ledBtn" onclick="toggleDevice('led')">
+                    LED Lights: OFF
                 </button>
             </div>
             <div class="setpoints-panel">
@@ -87,12 +100,7 @@
                     </div>
                 </div>
             </div>
-            <div class="control-group">
-                <h4>Lighting</h4>
-                <button class="control-button off" id="ledBtn" onclick="toggleDevice('led')">
-                    LED Lights: OFF
-                </button>
-            </div>
+
         </div>
     </div>
 </div>

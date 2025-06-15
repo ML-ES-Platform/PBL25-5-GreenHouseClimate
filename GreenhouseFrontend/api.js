@@ -11,7 +11,8 @@ const API_ENDPOINTS = {
     getSetpoints: `${API_BASE_URL}/setpoints`,
     updateHumiditySetpoints: `${API_BASE_URL}/control-panel/set-humidity-setpoint`,
     updateLightSetpoints: `${API_BASE_URL}/control-panel/set-light-setpoint`,
-    updateTemperatureSetpoints: `${API_BASE_URL}/control-panel/set-temperature-setpoint`
+    updateTemperatureSetpoints: `${API_BASE_URL}/control-panel/set-temperature-setpoint`,
+    setAutomode: `${API_BASE_URL}/control-panel/set-auto-mode`
 };
 
 // Authentication token storage
@@ -297,7 +298,12 @@ async function ensureAuthenticated() {
             console.log('Authentication cancelled by user');
             return false;
         }
-
+        await Promise.all([
+            loadCurrentData(),
+            loadDeviceStatus(),
+            loadHistoricalData('day'),
+            loadSetpoints()  // Add this line
+        ]);
         console.log('Authentication successful');
         return true;
     } finally {
@@ -900,6 +906,23 @@ console.log(JSON.stringify({ ["setpoint"]: parseFloat(value) }))
         return false;
     }
 }
+// Set auto mode
+async function setAutoMode() {
+    try {
+        await makeAuthenticatedRequest(
+            API_ENDPOINTS.setAutomode,
+            { method: 'POST' },
+            'setting auto mode'
+        );
+
+        console.log('Auto mode set successfully');
+        return true;
+
+    } catch (error) {
+        console.error('Failed to set auto mode:', error);
+        return false;
+    }
+}
 // Export functions for use in other scripts
 if (typeof window !== 'undefined') {
     window.greenhouseAPI = {
@@ -912,6 +935,7 @@ if (typeof window !== 'undefined') {
         logout,
         initializeAPI,
         ensureAuthenticated,
-        updateSetpoint
+        updateSetpoint,
+        setAutoMode
     };
 }
