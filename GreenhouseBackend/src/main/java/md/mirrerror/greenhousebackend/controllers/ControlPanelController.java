@@ -111,4 +111,13 @@ public class ControlPanelController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/set-auto-mode")
+    public ResponseEntity<Void> setAutoMode() {
+        awsIotService.sendCommand("SET_AUTO_MODE", null);
+
+        log.info("Set auto mode command sent");
+        return ResponseEntity.ok().build();
+    }
+
 }
