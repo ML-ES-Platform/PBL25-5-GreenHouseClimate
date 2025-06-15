@@ -135,31 +135,6 @@ This project is a full-stack IoT system for environmental monitoring and actuato
 
 ---
 
-## 🧪 Future Improvements
-
-* Add more sensors (CO2, soil moisture, etc.)
-* Improve actuator safety logic
-* Expand frontend UI with graphs and mobile support
-* Add email notifications or alert system
-
----
-
-## 📁 Repository Structure
-
-```
-/arduino/
-    main.ino         → ESP32 firmware
-/backend/
-    src/             → Spring Boot Java code
-/frontend/
-    index.html       → UI page
-    scripts.js       → Frontend logic
-    style.css        → Styling
-README.md            → You're here
-```
-
----
-
 ## 📜 License
 
 MIT License. Free to use and modify.
