@@ -40,14 +40,14 @@ This project is a full-stack IoT system for environmental monitoring and actuato
 #### Relays (controlled by ESP32)
 | Device            | ESP32 Pin | Relay Channel |
 |------------------|-----------|---------------|
-| Linear Motor A    | GPIO16    | Relay 1       |
-| Linear Motor B    | GPIO17    | Relay 2       |
-| DC Fan           | GPIO18    | Relay 3       |
-| LED              | GPIO19    | Relay 4       |
+| Linear Motor A    | GPIO27    | Relay 1       |
+| Linear Motor B    | GPIO33    | Relay 2       |
+| DC Fan           | GPIO2    | Relay 3       |
+| LED              | GPIO16    | Relay 4       |
 
 #### Sensors
-- **DHT11**: Connected to digital pin (e.g., GPIO21)
-- **Light Sensor**: Connected to analog pin (e.g., GPIO34)
+- **DHT11**: Connected to GPIO23
+- **Light Sensor**: Connected to GPIO18
 
 #### Power
 - All relays and actuators powered from 12V supply
