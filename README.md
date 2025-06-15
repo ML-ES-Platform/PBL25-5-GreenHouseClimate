@@ -70,14 +70,21 @@ This project is a full-stack IoT system for environmental monitoring and actuato
 - MySQL for persistent data storage
 
 ### Setup Steps
-1. Create `.env` or `application.properties` file:
+1. Create `.env` file:
    ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/iot_db
-   spring.datasource.username=root
-   spring.datasource.password=yourpassword
-   jwt.secret=your_jwt_secret
-   mqtt.broker=tcp://broker.hivemq.com:1883
-   mqtt.topic=sensor/data
+    MYSQL_URL=
+    MYSQL_USERNAME=
+    MYSQL_PASSWORD=
+    JWT_SECRET_KEY=
+    JWT_EXPIRATION_TIME=3600000000
+    
+    AWS_IOT_ENDPOINT=
+    AWS_IOT_CERTIFICATE_PATH=./aws-iot-files/device_cert.crt
+    AWS_IOT_PRIVATE_KEY_PATH=./aws-iot-files/private.key
+    AWS_IOT_CA_CERT_PATH=./aws-iot-files/AmazonRootCA1.pem
+    AWS_IOT_CLIENT_ID=greenhouse-1
+    AWS_IOT_THING_NAME=
+    AWS_IOT_TOPIC_PREFIX=greenhouse
 
 
 2. Run with Maven or your IDE:
