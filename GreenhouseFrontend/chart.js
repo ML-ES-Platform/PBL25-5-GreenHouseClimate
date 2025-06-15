@@ -1,6 +1,3 @@
-
-
-
 // Export functions for global use
 if (typeof window !== 'undefined') {
     window.chartFunctions = {

@@ -8,32 +8,29 @@ let deviceStates = {
     led: false
 };
 
-// Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    // First ensure authentication
-    if (window.greenhouseAPI && !window.greenhouseAPI.ensureAuthenticated()) {
-        // If authentication fails, show error and return
-        showAuthenticationError();
-        return;
-    }
-
+    // Initialize chart first
     initializeChart();
-    initializeAPI();
 
-    // Set up periodic data refresh
-    setInterval(() => {
-        if (window.greenhouseAPI && window.greenhouseAPI.ensureAuthenticated()) {
-            loadCurrentData();
-        }
-    }, UPDATE_INTERVALS.currentData);
+    // Then initialize API and wait for it to complete
+    initializeAPI().then(() => {
+        // Only set up intervals after initial data is loaded
+        setInterval(() => {
+            if (window.greenhouseAPI && window.greenhouseAPI.ensureAuthenticated()) {
+                loadCurrentData();
+            }
+        }, UPDATE_INTERVALS.currentData);
 
-    setInterval(() => {
-        if (window.greenhouseAPI && window.greenhouseAPI.ensureAuthenticated()) {
-            loadHistoricalData(currentTimeRange);
-        }
-    }, UPDATE_INTERVALS.historicalData);
+        setInterval(() => {
+            if (window.greenhouseAPI && window.greenhouseAPI.ensureAuthenticated()) {
+                loadHistoricalData(currentTimeRange);
+            }
+        }, UPDATE_INTERVALS.historicalData);
+    }).catch(error => {
+        console.error('Failed to initialize:', error);
+        showAuthenticationError();
+    });
 
-    // Add visual feedback for button clicks
     setupButtonFeedback();
 });
 
@@ -61,30 +58,6 @@ function showAuthenticationError() {
         `;
     }
 }
-// Load and display setpoints
-async function loadSetpoints() {
-    if (window.greenhouseAPI && !window.greenhouseAPI.ensureAuthenticated()) {
-        return;
-    }
-
-    try {
-        const setpoints = await window.greenhouseAPI.loadSetpoints();
-        updateSetpointDisplay(setpoints);
-    } catch (error) {
-        console.error('Failed to load setpoints:', error);
-    }
-}
-
-// Update setpoint display
-function updateSetpointDisplay(setpoints) {
-    const tempInput = document.getElementById('tempSetpoint');
-    const humidityInput = document.getElementById('humiditySetpoint');
-    const lightInput = document.getElementById('lightSetpoint');
-
-    if (tempInput) tempInput.value = setpoints.temperature || 21;
-    if (humidityInput) humidityInput.value = setpoints.humidity || 55;
-    if (lightInput) lightInput.value = setpoints.light || 40;
-}
 
 // Update individual setpoint
 async function updateSetpoint(type) {
@@ -92,7 +65,21 @@ async function updateSetpoint(type) {
         return;
     }
 
-    const inputId = `${type}Setpoint`;
+    let inputId;
+    switch(type) {
+        case 'temperature':
+            inputId = 'tempSetpoint';
+            break;
+        case 'humidity':
+            inputId = 'humiditySetpoint';
+            break;
+        case 'light':
+            inputId = 'lightSetpoint';
+            break;
+        default:
+            inputId = `${type}Setpoint`;
+    }
+
     const input = document.getElementById(inputId);
     const button = document.querySelector(`[onclick="updateSetpoint('${type}')"]`);
 

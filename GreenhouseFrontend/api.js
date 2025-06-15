@@ -204,6 +204,17 @@ function createLoginModal() {
     });
 }
 
+// Add this function to api.js:
+function updateSetpointDisplay(setpoints) {
+    const tempInput = document.getElementById('tempSetpoint');
+    const humidityInput = document.getElementById('humiditySetpoint');
+    const lightInput = document.getElementById('lightSetpoint');
+
+    if (tempInput) tempInput.value = setpoints.temperature || 21;
+    if (humidityInput) humidityInput.value = setpoints.humidity || 55;
+    if (lightInput) lightInput.value = setpoints.light || 40;
+}
+
 // Perform the actual login API call
 async function performLogin(credentials) {
     try {
@@ -915,9 +926,11 @@ async function loadSetpoints() {
 
         const controlPanel = await response.json();
         console.log('Loaded setpoints:', controlPanel);
-        await updateSetpoint("temperature", controlPanel.temperatureSetpoint)
-        await updateSetpoint("humidity", controlPanel.humiditySetpoint)
-        await updateSetpoint("light", controlPanel.lightSetpoint)
+        updateSetpointDisplay({
+            temperature: controlPanel.temperatureSetpoint || 21,
+            humidity: controlPanel.humiditySetpoint || 55,
+            light: controlPanel.lightSetpoint || 40
+        });
         return setpoints;
 
     } catch (error) {
@@ -1017,6 +1030,8 @@ if (typeof window !== 'undefined') {
         initializeAPI,
         ensureAuthenticated,
         updateSetpoint,
-        setAutoMode
+        setAutoMode,
+        loadSetpoints,
+        updateSetpointDisplay
     };
 }
