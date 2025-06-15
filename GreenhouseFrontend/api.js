@@ -986,7 +986,7 @@ async function updateSetpoint(type, value) {
             endpoint,
             {
                 method: 'POST',
-                body: JSON.stringify({ ["setpoint"]: parseFloat(value) })
+                body: JSON.stringify({ setpoint: parseFloat(value) })
             },
             `updating ${type} setpoint`
         );

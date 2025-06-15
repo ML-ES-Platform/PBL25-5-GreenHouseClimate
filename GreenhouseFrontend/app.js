@@ -68,7 +68,7 @@ async function updateSetpoint(type) {
     let inputId;
     switch(type) {
         case 'temperature':
-            inputId = 'tempSetpoint';
+            inputId = 'temperatureSetpoint';
             break;
         case 'humidity':
             inputId = 'humiditySetpoint';
