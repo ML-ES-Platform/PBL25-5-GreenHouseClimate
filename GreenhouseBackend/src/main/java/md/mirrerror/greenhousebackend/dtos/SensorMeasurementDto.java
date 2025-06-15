@@ -2,7 +2,7 @@ package md.mirrerror.greenhousebackend.dtos;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 public class SensorMeasurementDto {
@@ -10,6 +10,6 @@ public class SensorMeasurementDto {
     private Double temperature;
     private Double humidity;
     private Double light;
-    private LocalDateTime timestamp;
+    private ZonedDateTime timestamp;
 
 }

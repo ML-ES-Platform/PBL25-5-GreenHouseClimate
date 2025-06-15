@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "sensor_measurements")
@@ -26,6 +26,6 @@ public class SensorMeasurement {
     private Double light;
 
     @Column
-    private LocalDateTime timestamp;
+    private ZonedDateTime timestamp;
 
 }

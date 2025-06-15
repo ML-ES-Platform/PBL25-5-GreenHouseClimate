@@ -3,7 +3,6 @@ package md.mirrerror.greenhousebackend.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import md.mirrerror.greenhousebackend.dtos.ChangeSetpointCommand;
-import md.mirrerror.greenhousebackend.dtos.ToggleCommand;
 import md.mirrerror.greenhousebackend.entity.ControlPanel;
 import md.mirrerror.greenhousebackend.services.AWSIoTService;
 import org.springframework.http.ResponseEntity;

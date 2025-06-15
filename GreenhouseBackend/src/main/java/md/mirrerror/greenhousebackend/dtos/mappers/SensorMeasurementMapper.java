@@ -6,7 +6,7 @@ import md.mirrerror.greenhousebackend.dtos.SensorMeasurementDto;
 import md.mirrerror.greenhousebackend.entity.SensorMeasurement;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Component
@@ -52,7 +52,7 @@ public class SensorMeasurementMapper {
         sensorMeasurement.setTemperature(sensorMeasurementCreationDto.getTemperature());
         sensorMeasurement.setHumidity(sensorMeasurementCreationDto.getHumidity());
         sensorMeasurement.setLight(sensorMeasurementCreationDto.getLight());
-        sensorMeasurement.setTimestamp(LocalDateTime.now());
+        sensorMeasurement.setTimestamp(ZonedDateTime.now());
         return sensorMeasurement;
     }
 
