@@ -192,7 +192,7 @@ void processCommand(const JsonDocument& doc) {
         double setpoint = payload["setpoint"].as<double>();
         lightSetpoint = setpoint;
         Serial.printf("Light setpoint changed to: %.1f lx\n", lightSetpoint);
-    } else if (commandType == "AUTO_MODE") {
+    } else if (commandType == "SET_AUTO_MODE") {
         // Enable automatic mode (disable manual override for all devices)
         manualOverrideWindow = false;
         manualOverrideFan = false;
