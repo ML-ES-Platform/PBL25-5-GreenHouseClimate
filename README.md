@@ -86,7 +86,6 @@ This project is a full-stack IoT system for environmental monitoring and actuato
     AWS_IOT_THING_NAME=
     AWS_IOT_TOPIC_PREFIX=greenhouse
 
-
 2. Run with Maven or your IDE:
 
    ```bash
