@@ -6,7 +6,9 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import md.mirrerror.greenhousebackend.config.AWSIoTConfig;
+import md.mirrerror.greenhousebackend.dtos.ChangeSetpointCommand;
 import md.mirrerror.greenhousebackend.dtos.DeviceCommand;
+import md.mirrerror.greenhousebackend.dtos.ToggleCommand;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.crt.CRT;
 import software.amazon.awssdk.crt.CrtResource;
@@ -83,7 +85,7 @@ public class AWSIoTService {
             try {
                 boolean sessionPresent = connected.get();
                 log.info("Connected to AWS IoT Core: {}", sessionPresent ? "existing session" : "new session");
-                sendCommand("REQUEST_UPDATE", null);
+                sendRequestUpdateCommand();
             } catch (Exception ex) {
                 throw new RuntimeException("Exception occurred during connect", ex);
             }
@@ -109,6 +111,47 @@ public class AWSIoTService {
             log.error("Failed to send command to ESP32: {}", commandType, e);
             throw new RuntimeException("Failed to send IoT command", e);
         }
+    }
+
+    public void sendToggleWindowsCommand(boolean newState) {
+        sendToggleCommand("TOGGLE_WINDOWS", newState);
+    }
+
+    public void sendToggleFansCommand(boolean newState) {
+        sendToggleCommand("TOGGLE_FANS", newState);
+    }
+
+    public void sendToggleLightsCommand(boolean newState) {
+        sendToggleCommand("TOGGLE_LIGHTS", newState);
+    }
+
+    public void sendToggleCommand(String commandType, boolean newState) {
+        ToggleCommand command = ToggleCommand.builder().state(newState).build();
+        sendCommand(commandType, command);
+    }
+
+    public void sendSetTemperatureSetpointCommand(ChangeSetpointCommand changeSetpointCommand) {
+        sendChangeSetpointCommand("SET_TEMPERATURE", changeSetpointCommand);
+    }
+
+    public void sendSetHumiditySetpointCommand(ChangeSetpointCommand changeSetpointCommand) {
+        sendChangeSetpointCommand("SET_HUMIDITY", changeSetpointCommand);
+    }
+
+    public void sendSetLightSetpointCommand(ChangeSetpointCommand changeSetpointCommand) {
+        sendChangeSetpointCommand("SET_LIGHT", changeSetpointCommand);
+    }
+
+    public void sendSetAutoModeCommand() {
+        sendCommand("SET_AUTO_MODE", null);
+    }
+
+    public void sendChangeSetpointCommand(String commandType, ChangeSetpointCommand changeSetpointCommand) {
+        sendCommand(commandType, changeSetpointCommand);
+    }
+
+    public void sendRequestUpdateCommand() {
+        sendCommand("REQUEST_UPDATE", null);
     }
 
     @PreDestroy
