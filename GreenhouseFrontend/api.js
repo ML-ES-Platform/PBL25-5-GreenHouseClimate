@@ -45,13 +45,18 @@ function createLoginModal() {
 
     const form = document.createElement('div');
     form.style.cssText = `
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        max-width: 400px;
-        width: 90%;
-    `;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 90%;
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+`;
 
     form.innerHTML = `
         <h2 style="margin: 0 0 20px 0; text-align: center; color: #333;">
@@ -136,15 +141,32 @@ function createLoginModal() {
         const loadingDiv = document.getElementById('loginLoading');
 
         function showError(message) {
-            errorDiv.textContent = message;
+            errorDiv.innerHTML = `<strong>Login Failed:</strong><br>${message}`;
             errorDiv.style.display = 'block';
             loadingDiv.style.display = 'none';
             submitBtn.disabled = false;
             cancelBtn.disabled = false;
+
+            // Clear the error after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+
+            // Shake animation for better UX
+            form.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                form.style.animation = '';
+            }, 500);
         }
 
         function showLoading() {
             errorDiv.style.display = 'none';
+            loadingDiv.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <div style="width: 20px; height: 20px; border: 2px solid #f3f3f3; border-top: 2px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <span>Authenticating...</span>
+        </div>
+    `;
             loadingDiv.style.display = 'block';
             submitBtn.disabled = true;
             cancelBtn.disabled = true;
@@ -156,8 +178,21 @@ function createLoginModal() {
 
             if (!email || !password) {
                 showError('Please enter both email and password');
+                // Highlight empty fields
+                if (!email) {
+                    emailInput.style.borderColor = '#f44336';
+                    emailInput.focus();
+                }
+                if (!password) {
+                    passwordInput.style.borderColor = '#f44336';
+                    if (email) passwordInput.focus();
+                }
                 return;
             }
+
+// Reset border colors
+            emailInput.style.borderColor = '#ddd';
+            passwordInput.style.borderColor = '#ddd';
 
             showLoading();
 
@@ -179,6 +214,20 @@ function createLoginModal() {
         submitBtn.addEventListener('click', handleSubmit);
         cancelBtn.addEventListener('click', handleCancel);
 
+        // Clear errors when user starts typing
+        emailInput.addEventListener('input', () => {
+            emailInput.style.borderColor = '#ddd';
+            if (errorDiv.style.display === 'block') {
+                errorDiv.style.display = 'none';
+            }
+        });
+
+        passwordInput.addEventListener('input', () => {
+            passwordInput.style.borderColor = '#ddd';
+            if (errorDiv.style.display === 'block') {
+                errorDiv.style.display = 'none';
+            }
+        });
         // Enter key support
         emailInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -203,7 +252,20 @@ function createLoginModal() {
         });
     });
 }
-
+// Add this right after creating the modal
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+`;
+document.head.appendChild(style);
 // Perform the actual login API call
 async function performLogin(credentials) {
     try {
@@ -226,17 +288,27 @@ async function performLogin(credentials) {
         if (!response.ok) {
             let errorMessage = `Login failed (${response.status})`;
 
-            if (response.status === 401) {
-                errorMessage = 'Invalid email or password';
-            } else if (response.status === 403) {
-                errorMessage = 'Access forbidden';
-            } else if (response.status >= 500) {
-                errorMessage = 'Server error. Please try again later.';
+            // Try to get error message from response
+            try {
+                const errorData = JSON.parse(responseText);
+                if (errorData.message || errorData.error) {
+                    errorMessage = errorData.message || errorData.error;
+                }
+            } catch (e) {
+                // Use default messages if can't parse response
+                if (response.status === 401) {
+                    errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+                } else if (response.status === 403) {
+                    errorMessage = 'Access forbidden. Please contact your administrator.';
+                } else if (response.status >= 500) {
+                    errorMessage = 'Server error. Please try again in a few moments.';
+                } else if (response.status === 0 || !navigator.onLine) {
+                    errorMessage = 'Network error. Please check your internet connection.';
+                }
             }
 
             throw new Error(errorMessage);
         }
-
         let data;
         try {
             data = JSON.parse(responseText);
@@ -248,6 +320,7 @@ async function performLogin(credentials) {
         if (data.token) {
             authToken = data.token;
             console.log('Login successful, token received');
+
             return true;
         } else {
             console.error('No token in response:', data);
@@ -298,12 +371,6 @@ async function ensureAuthenticated() {
             console.log('Authentication cancelled by user');
             return false;
         }
-        await Promise.all([
-            loadCurrentData(),
-            loadDeviceStatus(),
-            loadHistoricalData('day'),
-            loadSetpoints()  // Add this line
-        ]);
         console.log('Authentication successful');
         return true;
     } finally {
@@ -593,8 +660,8 @@ async function initializeAPI() {
             await Promise.all([
                 loadCurrentData(),
                 loadDeviceStatus(),
-                loadHistoricalData('day'),
-                loadSetpoints()  // Add this line
+                loadSetpoints(),
+                loadHistoricalData('day')
             ]);
             console.log('API initialization complete');
         } else {
@@ -834,16 +901,25 @@ async function loadSetpoints() {
 
         const controlPanel = await response.json();
         console.log('Loaded setpoints:', controlPanel);
-        await updateSetpoint("temperature", controlPanel.temperatureSetpoint)
-        await updateSetpoint("humidity", controlPanel.humiditySetpoint)
-        await updateSetpoint("light", controlPanel.lightSetpoint)
+
+        // Update the UI display with the loaded setpoints
+        const setpoints = {
+            temperature: controlPanel.temperatureSetpoint || 21,
+            humidity: controlPanel.humiditySetpoint || 51,
+            light: controlPanel.lightSetpoint || 40
+        };
+
+        updateSetpointDisplay(setpoints);
         return setpoints;
 
     } catch (error) {
         console.error('Failed to load setpoints:', error);
-        return { temperature: 21, humidity: 51, light: 40 };
+        const defaultSetpoints = { temperature: 21, humidity: 51, light: 40 };
+        updateSetpointDisplay(defaultSetpoints);
+        return defaultSetpoints;
     }
 }
+
 async function loadDeviceStatus() {
     try {
         const response = await makeAuthenticatedRequest(
@@ -936,6 +1012,9 @@ if (typeof window !== 'undefined') {
         initializeAPI,
         ensureAuthenticated,
         updateSetpoint,
-        setAutoMode
+        setAutoMode,
+        loadSetpoints,
+        updateSetpointDisplay,
+        updateDeviceStates
     };
 }
