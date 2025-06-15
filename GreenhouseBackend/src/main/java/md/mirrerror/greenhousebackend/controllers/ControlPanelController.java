@@ -45,8 +45,7 @@ public class ControlPanelController {
         boolean newState = !controlPanel.getAreWindowsOpened();
         controlPanel.setAreWindowsOpened(newState);
 
-        ToggleCommand command = ToggleCommand.builder().state(newState).build();
-        awsIotService.sendCommand("TOGGLE_WINDOWS", command);
+        awsIotService.sendToggleWindowsCommand(newState);
 
         log.info("Windows toggled to: {}", newState);
         return ResponseEntity.ok().build();
@@ -58,8 +57,7 @@ public class ControlPanelController {
         boolean newState = !controlPanel.getAreFansOn();
         controlPanel.setAreFansOn(newState);
 
-        ToggleCommand command = ToggleCommand.builder().state(newState).build();
-        awsIotService.sendCommand("TOGGLE_FANS", command);
+        awsIotService.sendToggleFansCommand(newState);
 
         log.info("Fans toggled to: {}", newState);
         return ResponseEntity.ok().build();
@@ -71,8 +69,7 @@ public class ControlPanelController {
         boolean newState = !controlPanel.getAreLightsOn();
         controlPanel.setAreLightsOn(newState);
 
-        ToggleCommand command = ToggleCommand.builder().state(newState).build();
-        awsIotService.sendCommand("TOGGLE_LIGHTS", command);
+        awsIotService.sendToggleLightsCommand(newState);
 
         log.info("Lights toggled to: {}", newState);
         return ResponseEntity.ok().build();
@@ -83,7 +80,7 @@ public class ControlPanelController {
     public ResponseEntity<Void> setTemperatureSetpoint(@RequestBody ChangeSetpointCommand temperatureSetpointCommand) {
         controlPanel.setTemperatureSetpoint(temperatureSetpointCommand.getSetpoint());
 
-        awsIotService.sendCommand("SET_TEMPERATURE", temperatureSetpointCommand);
+        awsIotService.sendSetTemperatureSetpointCommand(temperatureSetpointCommand);
 
         log.info("Temperature setpoint changed to: {}", temperatureSetpointCommand);
         return ResponseEntity.ok().build();
@@ -94,7 +91,7 @@ public class ControlPanelController {
     public ResponseEntity<Void> setHumiditySetpoint(@RequestBody ChangeSetpointCommand humiditySetpointCommand) {
         controlPanel.setHumiditySetpoint(humiditySetpointCommand.getSetpoint());
 
-        awsIotService.sendCommand("SET_HUMIDITY", humiditySetpointCommand);
+        awsIotService.sendSetHumiditySetpointCommand(humiditySetpointCommand);
 
         log.info("Humidity setpoint changed to: {}", humiditySetpointCommand);
         return ResponseEntity.ok().build();
@@ -105,7 +102,7 @@ public class ControlPanelController {
     public ResponseEntity<Void> setLightSetpoint(@RequestBody ChangeSetpointCommand lightSetpointCommand) {
         controlPanel.setLightSetpoint(lightSetpointCommand.getSetpoint());
 
-        awsIotService.sendCommand("SET_LIGHT", lightSetpointCommand);
+        awsIotService.sendSetLightSetpointCommand(lightSetpointCommand);
 
         log.info("Light setpoint changed to: {}", lightSetpointCommand);
         return ResponseEntity.ok().build();
@@ -114,7 +111,7 @@ public class ControlPanelController {
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/set-auto-mode")
     public ResponseEntity<Void> setAutoMode() {
-        awsIotService.sendCommand("SET_AUTO_MODE", null);
+        awsIotService.sendSetAutoModeCommand();
 
         log.info("Set auto mode command sent");
         return ResponseEntity.ok().build();
