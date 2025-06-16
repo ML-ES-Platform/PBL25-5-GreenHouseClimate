@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = 'https:/greenhouse.ajdsgkljadkgjg.xyz';
+const API_BASE_URL = 'https://greenhouse.ajdsgkljadkgjg.xyz';
 const API_ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login`,
     controlPanelState: `${API_BASE_URL}/control-panel/state`,
