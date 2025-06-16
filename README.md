@@ -118,6 +118,21 @@ This project is a full-stack IoT system for environmental monitoring and actuato
 
 ---
 
+### Live Screenshots
+
+#### Login Page
+![Dashboard Screenshot](login.png)
+
+---
+
+#### Dashboard View
+![Dashboard Screenshot](dashboard.png)
+
+---
+
+#### Control Panel & Charts
+![Dashboard Screenshot](chart.png)
+
 ## 📡 Communication Flow
 
 ![img.png](img.png)
