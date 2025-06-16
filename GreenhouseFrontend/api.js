@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = 'https://back-gcc.ajdsgkljadkgjg.xyz';
+const API_BASE_URL = 'https:/greenhouse.ajdsgkljadkgjg.xyz';
 const API_ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login`,
     controlPanelState: `${API_BASE_URL}/control-panel/state`,
@@ -259,6 +259,7 @@ async function performLogin(credentials) {
         if (data.token) {
             authToken = data.token;
             console.log('Login successful, token received');
+
             return true;
         } else {
             console.error('No token in response:', data);
@@ -309,12 +310,6 @@ async function ensureAuthenticated() {
             console.log('Authentication cancelled by user');
             return false;
         }
-        await Promise.all([
-            loadCurrentData(),
-            loadDeviceStatus(),
-            loadHistoricalData('day'),
-            loadSetpoints()  // Add this line
-        ]);
         console.log('Authentication successful');
         return true;
     } finally {
@@ -685,8 +680,8 @@ async function initializeAPI() {
             await Promise.all([
                 loadCurrentData(),
                 loadDeviceStatus(),
-                loadHistoricalData('day'),
-                loadSetpoints()  // Add this line
+                loadSetpoints(),
+                loadHistoricalData('day')
             ]);
             console.log('API initialization complete');
         } else {
@@ -757,6 +752,10 @@ function filterDataByTimeRange(measurements, timeRange) {
     }
 
     filtered.sort((a, b) => {
+        // Limit to 20 points for 'now' timeRange
+        if (timeRange === 'now' && filtered.length > 20) {
+            return filtered.slice(-20); // Take the last 20 points
+        }
         const timeA = parseTimestamp(a.timestamp) || parseTimestamp(a.createdAt) || parseTimestamp(a.created_at) || 0;
         const timeB = parseTimestamp(b.timestamp) || parseTimestamp(b.createdAt) || parseTimestamp(b.created_at) || 0;
         return timeA - timeB;
@@ -771,18 +770,28 @@ function parseTimestamp(timestamp) {
     if (typeof timestamp === 'number') {
         return timestamp < 1e12 ? timestamp * 1000 : timestamp;
     } else if (typeof timestamp === 'string') {
-        let date = new Date(timestamp);
+        // Handle the new format: 2025-06-15T22:42:32.831662597+03:00
+        // Remove nanoseconds (keep only milliseconds) and ensure proper ISO format
+        let cleanTimestamp = timestamp;
+
+        // If it has nanoseconds (9 digits after decimal), truncate to milliseconds (3 digits)
+        if (timestamp.includes('.') && timestamp.match(/\.\d{9}/)) {
+            cleanTimestamp = timestamp.replace(/(\.\d{3})\d{6}/, '$1');
+        }
+
+        let date = new Date(cleanTimestamp);
         if (isNaN(date)) {
-            date = new Date(timestamp.replace(' ', 'T'));
+            // Try with space replaced by T
+            date = new Date(cleanTimestamp.replace(' ', 'T'));
         }
         if (isNaN(date)) {
-            date = new Date(timestamp.replace(' ', 'T') + 'Z');
+            // Try adding Z if no timezone info
+            date = new Date(cleanTimestamp.replace(' ', 'T') + 'Z');
         }
         return isNaN(date) ? null : date.getTime();
     }
     return null;
 }
-
 function convertToChartFormat(measurements, timeRange) {
     if (!measurements || measurements.length === 0) {
         return {
@@ -844,7 +853,19 @@ function convertToChartFormat(measurements, timeRange) {
         });
 
     } else {
-        measurements.forEach((measurement, index) => {
+
+// Sort measurements by timestamp for chronological order
+        const sortedMeasurements = [...measurements].sort((a, b) => {
+            const timeA = parseTimestamp(a.timestamp) || parseTimestamp(a.createdAt) || parseTimestamp(a.created_at) || 0;
+            const timeB = parseTimestamp(b.timestamp) || parseTimestamp(b.createdAt) || parseTimestamp(b.created_at) || 0;
+            return timeA - timeB;
+        });
+// Limit to 20 points for 'now' timeRange
+        const measurementsToProcess = timeRange === 'now' && sortedMeasurements.length > 20
+            ? sortedMeasurements.slice(-20)
+            : sortedMeasurements;
+
+        measurementsToProcess.forEach((measurement, index) => {
             const timestamp = parseTimestamp(measurement.timestamp) || parseTimestamp(measurement.createdAt) || parseTimestamp(measurement.created_at);
             if (timestamp) {
                 const time = new Date(timestamp);
@@ -860,8 +881,7 @@ function convertToChartFormat(measurements, timeRange) {
             chartData.temperature.push(parseFloat(measurement.temperature) || 0);
             chartData.humidity.push(parseFloat(measurement.humidity) || 0);
             chartData.light.push(parseFloat(measurement.light) || 0);
-        });
-    }
+        });    }
 
     return chartData;
 }
@@ -873,8 +893,9 @@ function generateMockHistoricalData(timeRange) {
 
     switch (timeRange) {
         case 'now':
-            interval = 30 * 1000;
-            count = 10;
+            points = 10;
+            interval = 30 * 1000; // 30 seconds
+            baseTime = new Date(now.getTime() - 5 * 1000);
             break;
         case 'day':
             interval = 60 * 60 * 1000;

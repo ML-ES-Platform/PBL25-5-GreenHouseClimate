@@ -207,6 +207,11 @@ function generateMockHistoricalData(timeRange) {
     const now = new Date();
 
     switch (timeRange) {
+        case 'now':
+            points = 20;
+            interval = 15 * 1000; // 15 seconds
+            baseTime = new Date(now.getTime() - 5 * 60 * 1000);
+            break;
         case 'day':
             points = 24;
             interval = 60 * 60 * 1000; // 1 hour
