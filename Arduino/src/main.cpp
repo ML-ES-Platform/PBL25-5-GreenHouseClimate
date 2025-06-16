@@ -260,7 +260,6 @@ void closeWindow() {
 }
 
 void startFan() {
-    if (1) return;  // Disable fan control for now
     if (!fanRunning && lastFanState != true) {  // Only act if state actually changed
         Serial.println("Starting motor fan...");
         digitalWrite(FAN_RELAY, HIGH);  
@@ -273,7 +272,6 @@ void startFan() {
 }
 
 void stopFan() {
-    if (1) return;
     if (fanRunning && lastFanState != false) {  // Only act if state actually changed
         Serial.println("Stopping motor fan...");
         digitalWrite(FAN_RELAY, LOW);
